@@ -24,35 +24,25 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled       = false
   georeplications {
     location                = " Central Us"
-    zone_redundancy_enabled = true
+    zone_redundancy_enabled = false
     tags                    = {}
   }
   georeplications {
     location                = "East Us2"
-    zone_redundancy_enabled = true
+    zone_redundancy_enabled = false
     tags                    = {}
 
   }
 
 }
-#azure web app service /service plan 
-
-resource "azurerm_app_service_plan" "asp" {
-  name                = "bmnn-appserviceplan"
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
-
-  sku {
-    tier = "Standard"
-    size = "S1"
-  }
-}
-
+#azure web app service 
 resource "azurerm_app_service" "apps" {
   name                = "bmnn-app-service"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
-  app_service_plan_id = var.app_service_plan_id
+  app_service_plan_id =azurerm_app_service_plan.asp.id
+  
+
 
   site_config {
     dotnet_framework_version = "v4.0"
@@ -62,11 +52,29 @@ resource "azurerm_app_service" "apps" {
   app_settings = {
     "SOME_KEY" = "some-value"
   }
-
+ 
   connection_string {
     name  = "Database"
     type  = "SQLServer"
     value = "Server=some-server.mydomain.com;Integrated Security=SSPI"
   }
 }
+
+
+# app service plan 
+
+
+resource "azurerm_app_service_plan" "asp" {
+  name                = "bmnn-app-service"
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
+  kind                = "Linux"
+  reserved            = true
+
+  sku {
+    tier = "Free F1"
+    size = "S1"
+  }
+}
+
 
