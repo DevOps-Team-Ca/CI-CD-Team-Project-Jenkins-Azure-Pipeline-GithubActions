@@ -12,16 +12,16 @@ provider "azurerm" {
 }
 #resource group
 resource "azurerm_resource_group" "rg1" {
-  name     = "cicdrg"
-  location = "East Us"
+  name     = var.resource_group_name
+  location = var.resource_group_location
 }
 #acr registry
 resource "azurerm_container_registry" "acr" {
-  name                = "acrbmnn"
+  name                = var.acr_name
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
   sku                 = "Premium"
-  admin_enabled       = false
+  admin_enabled       = true
   georeplications {
     location                = " Central Us"
     zone_redundancy_enabled = false
@@ -31,17 +31,14 @@ resource "azurerm_container_registry" "acr" {
     location                = "East Us2"
     zone_redundancy_enabled = false
     tags                    = {}
-
   }
-
 }
 #azure web app service 
 resource "azurerm_app_service" "apps" {
-  name                = "bmnn-app-service"
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
-  app_service_plan_id =azurerm_app_service_plan.asp.id
-  
+  name                = var.app_service_name
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
+  app_service_plan_id = azurerm_app_service_plan.asp.id
 
 
   site_config {
@@ -61,13 +58,12 @@ resource "azurerm_app_service" "apps" {
 }
 
 
-# app service plan 
-
+# app service plan
 
 resource "azurerm_app_service_plan" "asp" {
-  name                = "bmnn-app-service"
-  location            = var.resource_group_location
-  resource_group_name = var.resource_group_name
+  name                = var.app_service_plan_name
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
   kind                = "Linux"
   reserved            = true
 
