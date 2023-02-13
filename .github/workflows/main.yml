@@ -38,4 +38,4 @@ jobs:
 
      - run: |
          docker build . -t bannacr.azurecr.io/tetris:${{ github.sha }}
-         docker push bannacr.azurecr.io/tetris:latest
+         docker push bannacr.azurecr.io/tetris:${{ github.sha }}
