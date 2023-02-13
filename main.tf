@@ -20,20 +20,11 @@ resource "azurerm_container_registry" "acr" {
   name                = var.acr_name
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
-  sku                 = "Premium"
+  sku                 = "Basic"
   admin_enabled       = true
-  georeplications {
-    location                = " Central Us"
-    zone_redundancy_enabled = false
-    tags                    = {}
-  }
-  georeplications {
-    location                = "East Us2"
-    zone_redundancy_enabled = false
-    tags                    = {}
-  }
+
 }
-#azure web app service 
+#azure web app service
 resource "azurerm_app_service" "apps" {
   name                = var.app_service_name
   resource_group_name = azurerm_resource_group.rg1.name
@@ -49,7 +40,6 @@ resource "azurerm_app_service" "apps" {
   app_settings = {
     "SOME_KEY" = "some-value"
   }
- 
   connection_string {
     name  = "Database"
     type  = "SQLServer"

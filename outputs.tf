@@ -9,7 +9,7 @@ output "acr_login_server_name" {
 
 output "acr_admin_password" {
   value = azurerm_container_registry.acr.admin_password
-  sensitive = false
+  sensitive = true
 }
 output "webApp_URL" {
   value = "https://${lower(var.app_service_name)}.azurewebsites.net"
