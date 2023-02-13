@@ -39,3 +39,13 @@ jobs:
      - run: |
          docker build . -t bannacr.azurecr.io/tetris:${{ github.sha }}
          docker push bannacr.azurecr.io/tetris:${{ github.sha }}
+  deploy:
+     runs-on: ubuntu-latest
+     environment: production
+     
+     steps:
+     - uses: azure/webapps-deploy@v2
+       with:
+         app-name: 'BannTetris'
+         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+         images: 'bannacr.azurecr.io/tetris:${{ github.sha }}'
