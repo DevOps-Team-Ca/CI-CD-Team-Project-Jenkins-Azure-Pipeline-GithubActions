@@ -37,8 +37,8 @@ jobs:
          password: ${{ secrets.ACR_PASSWORD }}
 
      - run: |
-         docker build . -t bannacr.azurecr.io/tetris:${{ github.sha }}
-         docker push bannacr.azurecr.io/tetris:${{ github.sha }}
+         docker build . -t bannacr.azurecr.io/tetris:latest
+         docker push bannacr.azurecr.io/tetris:latest
   deploy:
      runs-on: ubuntu-latest
      environment: production
@@ -47,6 +47,6 @@ jobs:
      steps:
      - uses: azure/webapps-deploy@v2
        with:
-         app-name: 'BannTetris'
+         app-name: 'banntetris'
          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-         images: 'bannacr.azurecr.io/tetris:${{ github.sha }}'
+         images: 'bannacr.azurecr.io/tetris:latest'
