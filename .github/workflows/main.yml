@@ -34,7 +34,8 @@ jobs:
   build_and_push_acr:
      runs-on: ubuntu-latest
      environment: production
- 
+     needs:
+       login-to-Azure
      steps:
      # Checkout the repository to the GitHub Actions runner
      - name: "Checkout Github Action"
@@ -53,8 +54,7 @@ jobs:
   deploy:
      runs-on: ubuntu-latest
      environment: production
-     needs: |
-        login-to-Azure
+     needs:
         build_and_push_acr
      
      steps:
