@@ -10,43 +10,39 @@ on:
 defaults:
    run:
      shell: bash
-     
+permissions: 
+     id-token: write
+     contents: read
+
 jobs:
 
-  docker_build_push_acr:
+  build_and_push_acr:
      runs-on: ubuntu-latest
      environment: production
  
      steps:
      # Checkout the repository to the GitHub Actions runner
-     - name: Checkout
+     - name: "Checkout Github Action"
        uses: actions/checkout@v3
   
-     - name: Azure Login
-       uses: azure/docker-login@v1
-       with:
-         login-server: ${{ secrets.LOGIN_SERVER }}
-         username: ${{ secrets.ACR_USERNAME }}
-         password: ${{ secrets.ACR_PASSWORD }}
-    
      - name: "Docker Build and Push to ACR"
        uses: azure/docker-login@v1
        with:
          login-server: ${{ secrets.LOGIN_SERVER }}
          username: ${{ secrets.ACR_USERNAME }}
          password: ${{ secrets.ACR_PASSWORD }}
-
      - run: |
-         docker build . -t bannacr.azurecr.io/tetris:latest
+         docker build . -t ${{ secrets.LOGIN_SERVER }}/tetris:latest
          docker push bannacr.azurecr.io/tetris:latest
+  
   deploy:
      runs-on: ubuntu-latest
      environment: production
-     needs: docker_build_push_acr
+     needs: build_and_push_acr
      
      steps:
      - uses: azure/webapps-deploy@v2
        with:
-         app-name: 'banntetris'
-         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+         app-name: 'bannwebapp'
+#        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
          images: 'bannacr.azurecr.io/tetris:latest'
