@@ -17,20 +17,6 @@ permissions:
 jobs:
 
 # 1.Job
-  login-to-Azure:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Az CLI login'
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-  
-      - name: 'Run az commands'
-        run: |
-          az account show
-          az group list
-          pwd 
-# 2.Job          
   build_and_push_acr:
      runs-on: ubuntu-latest
      environment: production
@@ -50,18 +36,28 @@ jobs:
      - run: |
          docker build . -t ${{ secrets.LOGIN_SERVER }}/tetris:latest
          docker push bannacr.azurecr.io/tetris:latest
- # 3.Job 
+ # 2.Job 
   deploy:
      runs-on: ubuntu-latest
      environment: production
      needs:
         build_and_push_acr
-     
+        
      steps:
-     - name: 'Set private registry authentication settings'
-       run: az webapp config container set --name bannwebapp --resource-group web-app-rg --docker-registry-server-user ${{ secrets.ACR_USERNAME }} --docker-registry-server-password ${{ secrets.ACR_PASSWORD }}
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  
+      - name: 'Run az commands'
+        run: |
+          az account show
+          az group list
+          pwd 
+      - name: 'Set private registry authentication settings'
+        run: az webapp config container set --name bannwebapp --resource-group web-app-rg --docker-registry-server-user ${{ secrets.ACR_USERNAME }} --docker-registry-server-password ${{ secrets.ACR_PASSWORD }}
     
-     - uses: azure/webapps-deploy@v2
-       with:
+      - uses: azure/webapps-deploy@v2
+        with:
          app-name: 'bannwebapp'
          images: 'bannacr.azurecr.io/tetris:latest'
